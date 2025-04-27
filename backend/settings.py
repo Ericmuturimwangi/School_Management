@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'core',
     'corsheaders',
     'rest_framework',
+    'school',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
