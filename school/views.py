@@ -7,6 +7,8 @@ from rest_framework.permissions import BasePermission
 
 class IsTeacherOrAdmin(BasePermission):
     def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
         return request.user.role in ['teacher', 'admin']
 class SchoolClassViewSet(viewsets.ModelViewSet):
     queryset = SchoolClass.objects.all()
@@ -17,7 +19,7 @@ class SchoolClassViewSet(viewsets.ModelViewSet):
 class AttendanceViewSet(viewsets.ModelViewSet):
     queryset = Attendance.objects.all()
     serializer_class = AttendanceSerializer
-    permission_classes = [IsTeacherOrAdmin]
+    permission_classes = [IsAuthenticated,IsTeacherOrAdmin]
 
     def perform_create(self, serializer):
         serializer.save()

@@ -12,7 +12,7 @@ class User(AbstractUser):
     RANK_CHOICES = (
         ('SGT', 'Sergeant'),
         ('CPL', 'Corporal'),
-        ('SPTE', 'Specialist'),
+        ('SPTE', 'Private'),
         ('WOII', 'Warrant Officer II'),
         ('PTE', 'Private'),
         ('LCPL', 'Lance Corporal'),
