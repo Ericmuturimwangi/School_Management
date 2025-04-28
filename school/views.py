@@ -4,7 +4,8 @@ from .serializers import SchoolClassSerializer, AttendanceSerializer
 from .models import SchoolClass, Attendance
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
-
+from rest_framework.decorators import action
+from rest_framework.response import Response
 class IsTeacherOrAdmin(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
@@ -23,4 +24,12 @@ class AttendanceViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_attendance(self, request):
+        user = request.user
+        attendance_records = Attendance.objects.filter(student=user)
+        serializer = self.get_serializer(attendance_records, many=True)
+        return Response(serializer.data)
+    
 
