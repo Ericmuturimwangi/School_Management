@@ -6,11 +6,20 @@ from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from weasyprint import HTML
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+
 class IsTeacherOrAdmin(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
         return request.user.role in ['teacher', 'admin']
+    
+class IsStudent(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.role == 'student'
 class SchoolClassViewSet(viewsets.ModelViewSet):
     queryset = SchoolClass.objects.all()
     serializer_class =SchoolClassSerializer
@@ -38,6 +47,14 @@ class ResultViewSet(viewsets.ModelViewSet):
     serializer_class = ResultSerializer
     permission_classes = [IsAuthenticated]
 
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'destroy']:
+            self.permission_classes = [IsTeacherOrAdmin]
+        else:
+            self.permission_classes = [IsStudent]
+        return super().get_permissions()
+    
     def get_queryset(self):
         user = self.request.user
         if user.role == 'student':
@@ -45,7 +62,17 @@ class ResultViewSet(viewsets.ModelViewSet):
         elif user.role == 'teacher':
             return Result.objects.all()
         return Result.objects.none()
-    
-    def perform_create(self, serializer):
-        serializer.save()
         
+
+def generate_performance_report(request):
+    results = Result.objects.filter(student=request.user)
+
+    html_string = render_to_string('performance_report.html', {'results': results})
+
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="performance_report.pdf"'
+
+    return response
