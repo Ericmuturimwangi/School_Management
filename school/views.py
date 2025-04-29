@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
-from .serializers import SchoolClassSerializer, AttendanceSerializer
-from .models import SchoolClass, Attendance
+from .serializers import SchoolClassSerializer, AttendanceSerializer, ResultSerializer
+from .models import SchoolClass, Attendance, Result
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
@@ -33,3 +33,19 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 
+class ResultViewSet(viewsets.ModelViewSet):
+    queryset = Result.objects.all()
+    serializer_class = ResultSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'student':
+            return Result.objects.filter(student=user)
+        elif user.role == 'teacher':
+            return Result.objects.all()
+        return Result.objects.none()
+    
+    def perform_create(self, serializer):
+        serializer.save()
+        

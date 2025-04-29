@@ -27,6 +27,16 @@ class Attendance (models.Model):
     def __str__(self):
         return f"{self.student.username}- {self.school_class.name} - {self.status} on {self.date}"
     
+class Result (models.Model):
+    student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'})
+    school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=100)
+    score = models.DecimalField(max_digits=5, decimal_places=2)
+    remarks = models.TextField(blank=True, null=True)
+    date_recorded = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.school_class.name} - {self.score} on {self.date_recorded}"
  
 
 
