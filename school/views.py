@@ -9,13 +9,14 @@ from rest_framework.response import Response
 from weasyprint import HTML
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 
 
 class IsTeacherOrAdmin(BasePermission):
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
             return False
-        return request.user.role in ['teacher', 'admin']
+        return request.user.role in ['instructor', 'admin']
     
 class IsStudent(BasePermission):
     def has_permission(self, request, view):
@@ -63,7 +64,7 @@ class ResultViewSet(viewsets.ModelViewSet):
             return Result.objects.all()
         return Result.objects.none()
         
-
+@login_required
 def generate_performance_report(request):
     results = Result.objects.filter(student=request.user)
 

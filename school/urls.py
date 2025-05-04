@@ -9,6 +9,6 @@ router.register(r'results', ResultViewSet, basename='results')
 
 urlpatterns = router.urls
 
-urlpatterns =[
+urlpatterns = router.urls + [
     path('performance_report/', generate_performance_report, name='performance_report'),
 ]
