@@ -9,9 +9,11 @@ class SchoolClassSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'assigned_instructor', 'subject']
 
 class AttendanceSerializer(serializers.ModelSerializer):
+    student = serializers.CharField(source='student.username', read_only=True)
+    school_class = serializers.CharField(source='school_class.name', read_only=True)
     class Meta:
         model = Attendance
-        fields = ['id', 'student', 'school_class', 'date', 'status']
+        fields = ['id','student', 'school_class', 'date', 'status']
 
 class ResultSerializer(serializers.ModelSerializer):
     student_name = serializers.CharField(source='student.username', read_only=True)
